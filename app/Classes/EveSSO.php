@@ -5,18 +5,57 @@ namespace Reset\Classes;
 
 class EveSSO
 {
-    // auth uri
-    // token uri
-    // appKey
-    // appSecret
-    // refreshToken
-    // accessToken
+    protected $authUri;
+    protected $tokenUri;
+    protected $appKey;
+    protected $appSecret;
+    protected $refreshToken;
+    protected $accessToken;
 
-    // constructor - read config
+    public function __construct()
+    {
+        // TODO read configs and set vars
+    }
 
-    // redirectToSSO
+    public function redirectToSSO($scopes)
+    {
+        // TODO take list of scopes and redirect with request - array or text list?
+    }
 
-    // getAccessToken
+    public function handleCallback()
+    {
+        // Check state matches
+        // get an access token
+        // store refresh token
+    }
 
-    // getCharInfo
+    public function getAccessToken($code)
+    {
+        // cache using remember for 15 mins
+    }
+
+    public function getCharInfo()
+    {
+        //
+    }
+
+    protected function generateState()
+    {
+        //
+    }
+
+    protected function checkState()
+    {
+        //
+    }
+
+    protected function storeRefreshToken()
+    {
+        //
+    }
+
+    protected function renewAccessToken()
+    {
+        //
+    }
 }
