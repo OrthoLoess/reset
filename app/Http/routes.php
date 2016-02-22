@@ -28,4 +28,7 @@ Route::get('/', function () {
 
 Route::group(['middleware' => ['web']], function () {
     //
+    Route::get('feedback', function () {
+        return 'You\'ve been clicked, punk.';
+    });
 });
