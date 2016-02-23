@@ -14,4 +14,48 @@ class Crest
     // Read Contacts
 
     // Set Contact
+
+    protected $currentURI;
+    protected $crestRoot;
+
+    public function __construct($usePublicCrest = false)
+    {
+        $this->crestRoot = $usePublicCrest ? config('crest.public-root') : config('crest.auth-root');
+        $this->currentURI = $this->crestRoot;
+    }
+
+    public function returnToRoot()
+    {
+        //
+
+        return $this;
+    }
+
+    public function walk($endpointName)
+    {
+        //
+
+        return $this;
+    }
+
+    public function get()
+    {
+        // Perform a GET request at the $currentURI
+    }
+
+    public function post($payloadArray)
+    {
+        // Perform a POST request at the current URI, sending $payloadArray as json.
+    }
+
+    public function readCharacterContacts()
+    {
+        $contacts = [];
+
+        $this->returnToRoot()->walk('decode')->walk('Character')->walk('Contacts')->get();
+
+        return $contacts;
+    }
+
+
 }
