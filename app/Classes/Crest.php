@@ -38,7 +38,7 @@ class Crest
         return $this;
     }
 
-    public function get()
+    public function get($parameters = null)
     {
         // Perform a GET request at the $currentURI
     }
