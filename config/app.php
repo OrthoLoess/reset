@@ -155,6 +155,7 @@ return [
         Reset\Providers\AuthServiceProvider::class,
         Reset\Providers\EventServiceProvider::class,
         Reset\Providers\RouteServiceProvider::class,
+        Reset\Providers\CrestServiceProvider::class,
 
     ],
 
