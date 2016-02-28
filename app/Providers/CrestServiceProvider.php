@@ -33,11 +33,11 @@ class CrestServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton('Reset\Classes\Crest', function() {
-            return new Crest();
-        });
         $this->app->singleton('Reset\Classes\EveSSO', function() {
             return new EveSSO();
+        });
+        $this->app->singleton('Reset\Classes\Crest', function($app) {
+            return new Crest($app['Reset\Classes\EveSSO']);
         });
         $this->app->singleton('Pheal\Pheal', function() {
             return new Pheal();

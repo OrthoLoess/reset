@@ -29,7 +29,7 @@ class EveSSO
         // store refresh token
     }
 
-    public function getAccessToken($code)
+    public function getAccessToken($code = null)
     {
         // cache using remember for 15 mins
     }

@@ -21,16 +21,12 @@ class Crest
     protected $crestRoot;
     protected $guzzle;
 
-    public function __construct($usePublicCrest = false)
+    public function __construct($usePublicCrest = false, EveSSO $sso)
     {
         $this->crestRoot = $usePublicCrest ? config('crest.public-root') : config('crest.auth-root');
         $this->currentURI = $this->crestRoot;
-        $this->guzzle = new Client([
-            'headers'  => [
-                'User-Agent' => '', // TODO Set CREST headers
-
-            ],
-        ]);
+        $this->sso = $sso;
+        $this->guzzle = new Client();
     }
 
     public function returnToRoot()
@@ -47,19 +43,29 @@ class Crest
         return $this;
     }
 
-    public function get($parameters = null)
+    public function get($version = null, $parameters = null)
     {
         // Perform a GET request at the $currentURI
         $uri = $this->currentURI;
         if ($parameters) {
             $uri = $uri.'?'.http_build_query($parameters);
         }
-        return $this->getUri($uri);
+        return $this->getUri($uri, $version);
     }
 
-    public function getUri($uri)
+    public function getUri($uri, $version = null)
     {
+        $options = [
+            'Headers' => [
+                'User-Agent' => 'Reset app by Ortho Loess, hosted at '.config('app.url'),
+                'Authorization' => 'Bearer '.$this->sso->getAccessToken(),
+            ],
+        ];
+        if ($version) {
+            $options['Headers']['Accept'] = $version;
+        }
 
+        $this->guzzle->get($uri, $options);
         return true;
     }
 
@@ -72,7 +78,8 @@ class Crest
     {
         $contacts = [];
 
-        $this->returnToRoot()->walk('decode')->walk('Character')->walk('Contacts')->get();
+        $version = config('crest.versions.contacts');
+        $this->returnToRoot()->walk('decode')->walk('Character')->walk('Contacts')->get($version);
 
         return $contacts;
     }
