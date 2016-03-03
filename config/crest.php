@@ -17,14 +17,16 @@ return [
     |--------------------------------------------------------------------------
     | EVE SSO vars
     |--------------------------------------------------------------------------
-    | URIs can be changed to SISI for testing.
+    | URIs can be changed to SISI for testing by setting SSO_ROOT in the .env file.
     |
     | App Key and App Secret are obtained from developers.eveonline.com
     */
-    'sso-auth-uri' => "",
-    'sso-token-uri' => "",
-    'app-key' => env('SSO_APP_KEY'),
+    'sso-auth-uri' => env('SSO_ROOT', "https://login.eveonline.com/")."oauth/authorize/",
+    'sso-token-uri' => env('SSO_ROOT', "https://login.eveonline.com/")."oauth/token/",
+    'sso-verify-uri' => env('SSO_ROOT', "https://login.eveonline.com/")."oauth/verify/",
+    'app-id' => env('SSO_APP_ID'),
     'app-secret' => env('SSO_APP_SECRET'),
+    'scopes' => ['characterContactsRead', 'characterContactsWrite'],
 
     /*
     |--------------------------------------------------------------------------

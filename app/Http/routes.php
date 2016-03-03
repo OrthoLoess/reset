@@ -11,6 +11,8 @@
 |
 */
 
+use Illuminate\Http\Request;
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -30,5 +32,25 @@ Route::group(['middleware' => ['web']], function () {
     //
     Route::get('feedback', function () {
         return 'You\'ve been clicked, punk.';
+    });
+    Route::get('test', function (\Reset\Classes\EveSSO $sso) {
+        $charInfo = [
+            'characterID' => 95590328,
+        ];
+        //$sso->getAffiliation($charInfo);
+        //dd($charInfo);
+        return $sso->redirectToSSO(config('crest.scopes'));
+    });
+    Route::get('callback', function (\Reset\Classes\EveSSO $sso, Request $request) {
+        $sso->handleCallback($request);
+        return 'login complete';
+    });
+    Route::get('test64', function (\Reset\Classes\EveSSO $sso) {
+        $charInfo = [
+            'characterID' => 95590328,
+        ];
+        //$sso->getAffiliation($charInfo);
+        //dd($charInfo);
+        return $sso->makeBasicAuthHeader();
     });
 });
