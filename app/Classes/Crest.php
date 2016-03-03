@@ -17,6 +17,7 @@ class Crest
 
     // Set Contact
 
+    protected $currentEndpoint;
     protected $currentURI;
     protected $crestRoot;
     protected $guzzle;
@@ -31,21 +32,24 @@ class Crest
 
     public function returnToRoot()
     {
-        //
-
+        $this->currentEndpoint = 'root';
+        $this->currentURI = $this->crestRoot;
         return $this;
     }
 
     public function walk($endpointName)
     {
-        //
 
+        $response = $this->get();
+        $this->currentURI = $response[$endpointName]['href'];
+        $this->currentEndpoint = $endpointName;
         return $this;
     }
 
-    public function get($version = null, $parameters = null)
+    public function get($parameters = null)
     {
         // Perform a GET request at the $currentURI
+        $version = config('crest.versions.'.$this->currentEndpoint);
         $uri = $this->currentURI;
         if ($parameters) {
             $uri = $uri.'?'.http_build_query($parameters);
@@ -56,17 +60,17 @@ class Crest
     public function getUri($uri, $version = null)
     {
         $options = [
-            'Headers' => [
+            'headers' => [
                 'User-Agent' => 'Reset app by Ortho Loess, hosted at '.config('app.url'),
                 'Authorization' => 'Bearer '.$this->sso->getAccessToken(),
             ],
         ];
         if ($version) {
-            $options['Headers']['Accept'] = $version;
+            $options['headers']['Accept'] = $version;
         }
-
-        $this->guzzle->get($uri, $options);
-        return true;
+        dump($options);
+        $response = $this->guzzle->get($uri, $options);
+        return json_decode($response->getBody(), true);
     }
 
     public function post($payloadArray)
@@ -79,7 +83,8 @@ class Crest
         $contacts = [];
 
         $version = config('crest.versions.contacts');
-        $this->returnToRoot()->walk('decode')->walk('Character')->walk('Contacts')->get($version);
+        $contacts = $this->returnToRoot()->walk('decode')->walk('character')->walk('contacts')->get();
+
 
         return $contacts;
     }

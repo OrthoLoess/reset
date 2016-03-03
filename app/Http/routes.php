@@ -12,6 +12,7 @@
 */
 
 use Illuminate\Http\Request;
+use Reset\Classes\EveSSO;
 
 Route::get('/', function () {
     return view('welcome');
@@ -41,10 +42,7 @@ Route::group(['middleware' => ['web']], function () {
         //dd($charInfo);
         return $sso->redirectToSSO(config('crest.scopes'));
     });
-    Route::get('callback', function (\Reset\Classes\EveSSO $sso, Request $request) {
-        $sso->handleCallback($request);
-        return 'login complete';
-    });
+
     Route::get('test64', function (\Reset\Classes\EveSSO $sso) {
         $charInfo = [
             'characterID' => 95590328,
@@ -52,5 +50,18 @@ Route::group(['middleware' => ['web']], function () {
         //$sso->getAffiliation($charInfo);
         //dd($charInfo);
         return $sso->makeBasicAuthHeader();
+    });
+
+    Route::get('/', 'DashboardController@home');
+    Route::get('login', function(EveSSO $sso) {
+        return $sso->redirectToSSO(config('crest.scopes'));
+    });
+    Route::get('callback', function (\Reset\Classes\EveSSO $sso, Request $request) {
+        $sso->handleCallback($request);
+        return redirect('/');
+    });
+
+    Route::group(['middleware' => ['auth']], function () {
+        Route::get('readcontacts', 'ContactsController@readCrestContacts');
     });
 });

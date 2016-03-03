@@ -37,7 +37,7 @@ class CrestServiceProvider extends ServiceProvider
             return new EveSSO();
         });
         $this->app->singleton('Reset\Classes\Crest', function($app) {
-            return new Crest($app['Reset\Classes\EveSSO']);
+            return new Crest(false, $app['Reset\Classes\EveSSO']);
         });
         $this->app->singleton('Pheal\Pheal', function() {
             return new Pheal();
