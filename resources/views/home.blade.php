@@ -15,18 +15,19 @@
                 <p>Pull all alliance and corp contacts from the API and set a neutral contact for each via CREST.</p>
                 {!! Form::open(['url' => 'getxml', 'method' => 'get', 'class' => 'form']) !!}
                 <div class="radio-inline">
-                    <label><input type="radio" name="justBlues" value="true" checked>Override blue contacts only</label>
+                    <label><input type="radio" name="justBlues" value="1" checked>Override blue contacts only</label>
                 </div>
                 <div class="radio-inline">
-                    <label><input type="radio" name="justBlues" value="false">Override red and blue contacts</label>
+                    <label><input type="radio" name="justBlues" value="0">Override red and blue contacts</label>
                 </div>
-                <button type="submit" class="btn btn-default"{{ $hasApi? '' : ' disabled' }}>Add Contacts</button>
+                <button type="submit" class="btn btn-default"{{ $hasApi ? '' : ' disabled' }}>Add Contacts</button>
                 {!! Form::close() !!}
             </div>
         </div>
         <div class="panel panel-default col-sm-6 text-center">
             <div class="panel-body">
-                Panel Content: {{ $count }}
+                <p>You currently have {{ $count }} contact overrides in place.</p>
+                <a href="removeContacts" class="btn btn-default"{{ $count ? '' : ' disabled'}}>Remove Contacts</a>
             </div>
         </div>
 
@@ -48,6 +49,15 @@
             {!! Form::close() !!}
             <p>API key must have contactList and be of type character. <a href="https://community.eveonline.com/support/api-key/CreatePredefined?accessMask=16" target="_blank">Magic link!</a><br>
             It must give access for the character you logged in with: {{ Auth::user()->name }}</p>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-sm-12">
+            <h1 id="about">About</h1>
+            <p>
+                This tool was written for the EVE Crest Competition in March 2016. It is open source, licenced under MIT, source is available on <a>GitHub</a>
+            </p>
         </div>
     </div>
 @endsection

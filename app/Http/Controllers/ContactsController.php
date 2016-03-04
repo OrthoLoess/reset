@@ -34,8 +34,9 @@ class ContactsController extends Controller
         $this->pullStandings();
     }
 
-    public function writeFromXML($justBlues = true)
+    public function writeFromXML(Request $request)
     {
+        $justBlues = (bool) $request->input('justBlues');
         $contacts = $this->pullStandings();
         $contacts = array_merge($contacts['corp'], $contacts['alliance']);
         $contacts = array_filter($contacts, function ($contact) use ($justBlues) {
@@ -47,14 +48,15 @@ class ContactsController extends Controller
         foreach ($contacts as $contact) {
             $crestContact = $this->makeCrestContact($contact);
             $uri = $this->crest->postContact($crestContact);
-            $newContact = Contact::firstOrCreate([
+            Contact::firstOrCreate([
                 'json' => json_encode($crestContact),
                 'user_id' => $this->user->id,
                 'href' => $uri,
             ]);
             //dd($newContact);
         }
-        dd($this->user->savedContacts);
+        //dd($this->user->savedContacts);
+        return redirect('/')->with('alert-success', 'Contacts written to client');
     }
 
     public function setApiKey(Request $request)
@@ -64,8 +66,18 @@ class ContactsController extends Controller
             $this->user->vCode = $request->input('vCode');
             $this->user->save();
         } else {
-            return redirect('/')->withInput()->with('error', 'Key not of correct type, please check access mask');
+            return redirect('/')->withInput()->with('alert-error', 'Key not of correct type, please check access mask');
         }
+    }
+
+    public function removeContacts()
+    {
+        $contacts = $this->user->savedContacts;
+        foreach ($contacts as $contact) {
+            $this->crest->delete($contact->href);
+            $contact->delete();
+        }
+        return redirect('/')->with('alert-info', 'Contact overrides removed. Contacts should be back how they were.');
     }
 
     protected function makeCrestContact($xmlContact)
@@ -110,6 +122,11 @@ class ContactsController extends Controller
         return true;
     }
 
+
+    /* **************************************************************************
+     * Everything below is on hold until crest contacts has support for labels.
+     * **************************************************************************
+     */
 
     public function saveCrestContacts()
     {
