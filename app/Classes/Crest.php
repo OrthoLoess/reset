@@ -89,7 +89,7 @@ class Crest
             ],
             'json' => $payloadArray,
         ];
-        $this->guzzle->post($this->currentURI, $options);
+        return $this->guzzle->post($this->currentURI, $options);
     }
 
     public function delete($uri)
@@ -110,9 +110,10 @@ class Crest
 
     public function postContact($contact)
     {
-        unset($contact['href']);
+        //unset($contact['href']);
 
         //dd($contact);
-        $this->returnToRoot()->walk('decode')->walk('character')->walk('contacts')->post($contact);
+        $response = $this->returnToRoot()->walk('decode')->walk('character')->walk('contacts')->post($contact);
+        return $response->getHeader('Location')[0];
     }
 }

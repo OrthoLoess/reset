@@ -7,6 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 class Contact extends Model
 {
     protected $fillable = [
-        'user_id', 'type', 'entity_id', 'name', 'standing'
+        'user_id', 'json', 'href',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo('Reset\User');
+    }
 }

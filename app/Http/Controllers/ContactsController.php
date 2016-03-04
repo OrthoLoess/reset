@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use Pheal\Pheal;
 use Reset\Classes\Crest;
+use Reset\Contact;
 use Reset\Http\Requests;
 use Reset\Http\Controllers\Controller;
 use Auth;
@@ -15,13 +16,100 @@ class ContactsController extends Controller
 {
 
     protected $crest;
+    /**
+     * @var \Reset\User
+     */
     protected $user;
+    protected $pheal;
 
     public function __construct(Crest $crest)
     {
         $this->crest = $crest;
         $this->user = Auth::user();
+        $this->pheal = new Pheal($this->user->keyId, $this->user->vCode, 'char');
     }
+
+    public function getXmlContacts()
+    {
+        $this->pullStandings();
+    }
+
+    public function writeFromXML($justBlues = true)
+    {
+        $contacts = $this->pullStandings();
+        $contacts = array_merge($contacts['corp'], $contacts['alliance']);
+        $contacts = array_filter($contacts, function ($contact) use ($justBlues) {
+            if (((int) $contact['standing']) > 0 || (((int) $contact['standing']) < 0 && !$justBlues)){
+                return true;
+            }
+            return false;
+        });
+        foreach ($contacts as $contact) {
+            $crestContact = $this->makeCrestContact($contact);
+            $uri = $this->crest->postContact($crestContact);
+            $newContact = Contact::firstOrCreate([
+                'json' => json_encode($crestContact),
+                'user_id' => $this->user->id,
+                'href' => $uri,
+            ]);
+            //dd($newContact);
+        }
+        dd($this->user->savedContacts);
+    }
+
+    public function setApiKey(Request $request)
+    {
+        if ($this->checkKey($request->input('keyId'), $request->input('vCode'))){
+            $this->user->keyId = $request->input('keyId');
+            $this->user->vCode = $request->input('vCode');
+            $this->user->save();
+        } else {
+            return redirect('/')->withInput()->with('error', 'Key not of correct type, please check access mask');
+        }
+    }
+
+    protected function makeCrestContact($xmlContact)
+    {
+        //dd($xmlContact);
+        $contactType = $this->getContactType($xmlContact['contactTypeID']);
+        return [
+            'standing' => 0,
+            'contactType' => $contactType,
+            'contact' => [
+                'id_str' => $xmlContact['contactID'],
+                'href' => config('crest.auth-root').strtolower($contactType).'s/'.$xmlContact['contactID'].'/',
+                'name' => $xmlContact['contactName'],
+                'id' => (int) $xmlContact['contactID'],
+            ],
+            'watched' => false,
+        ];
+    }
+
+    protected function getContactType($typeId)
+    {
+        if ($typeId == 2)
+            return 'Corporation';
+        if ($typeId == 16159)
+            return 'Alliance';
+        return 'Character';
+    }
+
+    protected function pullStandings()
+    {
+        $response = $this->pheal->ContactList(['characterID' => $this->user->id]);
+        $contacts = [
+            'corp' => $response->corporateContactList->toArray(),
+            'alliance' => $response->allianceContactList->toArray(),
+        ];
+        return $contacts;
+    }
+
+    protected function checkKey($keyId, $vCode)
+    {
+        // TODO: check access mask and character.
+        return true;
+    }
+
 
     public function saveCrestContacts()
     {
@@ -41,11 +129,6 @@ class ContactsController extends Controller
             $this->crest->postContact($contact);
         }
         Cache::put('contacts:'.$this->user->id, $this->user->contacts, 5);
-    }
-
-    public function writeFromXML(Pheal $pheal)
-    {
-        //
     }
 
     protected function getCurrentContacts()
