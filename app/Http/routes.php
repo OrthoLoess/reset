@@ -62,6 +62,7 @@ Route::group(['middleware' => ['web']], function () {
     });
 
     Route::group(['middleware' => ['auth']], function () {
-        Route::get('readcontacts', 'ContactsController@readCrestContacts');
+        Route::get('readcontacts', 'ContactsController@saveCrestContacts');
+        Route::get('restorebackup', 'ContactsController@writeFromBackup');
     });
 });

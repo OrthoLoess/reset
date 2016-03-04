@@ -39,7 +39,6 @@ class Crest
 
     public function walk($endpointName)
     {
-
         $response = $this->get();
         $this->currentURI = $response[$endpointName]['href'];
         $this->currentEndpoint = $endpointName;
@@ -54,7 +53,15 @@ class Crest
         if ($parameters) {
             $uri = $uri.'?'.http_build_query($parameters);
         }
-        return $this->getUri($uri, $version);
+        $arrayResponse = $this->getUri($uri, $version);
+
+        // If resource is paginated, pull all pages and combine.
+        while (array_key_exists('items', $arrayResponse) && array_key_exists('next', $arrayResponse)) {
+            $nextPage = $this->getUri($arrayResponse['next']['href'], $version);
+            $nextPage['items'] = array_merge($arrayResponse['items'], $nextPage['items']);
+            $arrayResponse = $nextPage;
+        }
+        return $arrayResponse;
     }
 
     public function getUri($uri, $version = null)
@@ -68,7 +75,6 @@ class Crest
         if ($version) {
             $options['headers']['Accept'] = $version;
         }
-        dump($options);
         $response = $this->guzzle->get($uri, $options);
         return json_decode($response->getBody(), true);
     }
@@ -76,18 +82,37 @@ class Crest
     public function post($payloadArray)
     {
         // Perform a POST request at the current URI, sending $payloadArray as json.
+        $options = [
+            'headers' => [
+                'User-Agent' => 'Reset app by Ortho Loess, hosted at '.config('app.url'),
+                'Authorization' => 'Bearer '.$this->sso->getAccessToken(),
+            ],
+            'json' => $payloadArray,
+        ];
+        $this->guzzle->post($this->currentURI, $options);
+    }
+
+    public function delete($uri)
+    {
+        $options = [
+            'headers' => [
+                'User-Agent' => 'Reset app by Ortho Loess, hosted at '.config('app.url'),
+                'Authorization' => 'Bearer '.$this->sso->getAccessToken(),
+            ],
+        ];
+        $this->guzzle->delete($uri, $options);
     }
 
     public function readCharacterContacts()
     {
-        $contacts = [];
-
-        $version = config('crest.versions.contacts');
-        $contacts = $this->returnToRoot()->walk('decode')->walk('character')->walk('contacts')->get();
-
-
-        return $contacts;
+        return $this->returnToRoot()->walk('decode')->walk('character')->walk('contacts')->get()['items'];
     }
 
+    public function postContact($contact)
+    {
+        unset($contact['href']);
 
+        //dd($contact);
+        $this->returnToRoot()->walk('decode')->walk('character')->walk('contacts')->post($contact);
+    }
 }
