@@ -10,19 +10,21 @@ use Auth;
 
 class DashboardController extends Controller
 {
-    public function dashboard()
-    {
-        $user = Auth::user();
-        return 'Welcome to the dashboard '.$user->name;
-    }
-
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function home()
     {
         if (Auth::check()) {
             $user = Auth::user();
-            return 'Welcome to the dashboard '.$user->name;
+            $contacts = $user->savedContacts;
+            $count = $contacts->count();
+            return view('home', [
+                'count' => $count,
+                'hasApi' => $user->keyId ? true : false,
+            ]);
         } else {
-            return 'Landing page<br><br><a href="login">Login</a>';
+            return view('landing');
         }
 
     }
