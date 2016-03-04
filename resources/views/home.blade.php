@@ -56,7 +56,7 @@
         <div class="col-sm-12">
             <h1 id="about">About</h1>
             <p>
-                This tool was written for the EVE Crest Competition in March 2016. It is open source, licenced under MIT, source is available on <a>GitHub</a>
+                This tool was written for the EVE Crest Competition in March 2016. It is open source, licenced under MIT, source is available on <a href="https://github.com/OrthoLoess/reset">GitHub</a>
             </p>
         </div>
     </div>

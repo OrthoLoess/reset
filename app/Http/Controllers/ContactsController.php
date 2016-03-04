@@ -65,6 +65,7 @@ class ContactsController extends Controller
             $this->user->keyId = $request->input('keyId');
             $this->user->vCode = $request->input('vCode');
             $this->user->save();
+            return redirect('/')->with('alert-success', 'API key set successfully');
         } else {
             return redirect('/')->withInput()->with('alert-error', 'Key not of correct type, please check access mask');
         }

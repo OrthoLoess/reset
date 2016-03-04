@@ -66,5 +66,10 @@ Route::group(['middleware' => ['web']], function () {
         Route::get('restorebackup', 'ContactsController@writeFromBackup');
         Route::get('getxml', 'ContactsController@writeFromXML');
         Route::get('removeContacts', 'ContactsController@removeContacts');
+        Route::get('logout', function () {
+            \Auth::logout();
+            return redirect('/');
+        });
+        Route::post('users/postKey', 'ContactsController@setApiKey');
     });
 });

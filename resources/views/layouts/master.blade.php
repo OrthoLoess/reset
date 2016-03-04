@@ -18,27 +18,33 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
   </head>
+  @if (Auth::check())
   <body style="padding-top: 60px">
   <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container">
       <div class="navbar-header">
-        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+        <!--<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
           <span class="sr-only">Toggle navigation</span>
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
-        </button>
+        </button>-->
         <a class="navbar-brand" href="#">Reset</a>
+
       </div>
-      <div id="navbar" class="collapse navbar-collapse">
+      <!--<div id="navbar" class="collapse navbar-collapse">
         <ul class="nav navbar-nav">
           <li class="active"><a href="#">Home</a></li>
           <li><a href="#about">About</a></li>
           <li><a href="#">Contacts</a></li>
         </ul>
       </div><!--/.nav-collapse -->
+      <a class="navbar-brand pull-right" href="logout">Logout</a>
     </div>
   </nav>
+  @else
+    <body style="padding-top: 30px">
+    @endif
 
   <div class="container">
     @include('layouts.flash')
